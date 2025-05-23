@@ -19,7 +19,7 @@
       </p>
       <p>🤝 Ajuda’ns a seguir salvant vides **adoptant, acollint i donant.**</p>
       <p>
-        **Junts, podem fer que el món siga un lloc més just per a tots els éssers vius.**
+        <strong>Junts, podem fer que el món siga un lloc més just per a tots els éssers vius.</strong>
       </p>
       <p class="final-phrase">
         <span class="animal-emojis">🐶🐱🦜🐰</span><br>
