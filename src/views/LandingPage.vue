@@ -17,7 +17,7 @@
         📍 Treballem amb veterinaris, famílies acollidores i voluntaris que comparteixen el nostre objectiu:
         que cap animal quede enrere.
       </p>
-      <p>🤝 Ajuda’ns a seguir salvant vides <strong>adoptant, acollint i donant.*</strong></p>
+      <p>🤝 Ajuda’ns a seguir salvant vides <strong>adoptant, acollint i donant.</strong></p>
       <p>
         <strong>Junts, podem fer que el món siga un lloc més just per a tots els éssers vius.</strong>
       </p>
