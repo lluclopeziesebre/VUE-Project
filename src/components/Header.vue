@@ -9,38 +9,42 @@
 </template>
 
 <script setup>
+// Aquest component no necessita lògica JavaScript específica per ara.
 </script>
 
 <style scoped>
+/* Estils generals per a la capçalera. */
 .my-header {
-  /* Fondo blanco puro con una ligera transparencia para que se integre mejor */
-  background-color: rgba(255, 255, 255, 0.95); /* Blanco con 95% de opacidad */
-  /* Eliminamos la sombra por completo */
-  /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); */
+  /* Fons amb lleugera transparència. */
+  background-color: rgba(255, 255, 255, 0.95);
   text-align: center;
-  color: #333; /* Color de texto por defecto más oscuro */
+  color: #333;
 }
 
+/* Estils per a la barra de navegació. */
 .my-navbar {
-  gap: 2.5rem; /* Más espacio entre los enllaços */
+  /* Espaiat entre els elements de navegació. */
+  gap: 2.5rem;
 }
 
+/* Estils per als enllaços de navegació individuals. */
 .nav-link {
-  color: #8e2de2; /* Blau principal per als enllaços */
+  color: #8e2de2;
   text-decoration: none;
-  padding: 0.5rem 1rem; /* Més padding per a àrees de clic més grans */
-  font-weight: 600; /* Text seminegreta */
-  font-size: 1.05rem; /* Lleugerament més gran */
-  transition: all 0.3s ease; /* Transició suau per a tots els canvis */
-  position: relative; /* Per a l'efecte de subratllat personalitzat */
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
+/* Estils per als enllaços de navegació en estat "hover". */
 .nav-link:hover {
-  color: #6a1bb2; /* Un blau una mica més fosc al passar el ratolí */
-  text-decoration: none; /* Assegurar que no hi hagi subratllat natiu */
+  color: #6a1bb2;
+  text-decoration: none;
 }
 
-/* Efecte de subratllat animat a l'hover */
+/* Efecte de subratllat animat que apareix en passar el ratolí per sobre. */
 .nav-link::after {
   content: '';
   position: absolute;
@@ -49,24 +53,27 @@
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #6a1bb2; /* Verd per al subratllat, donant un toc de color */
+  background-color: #6a1bb2;
   transition: width 0.3s ease;
 }
 
+/* Quan el ratolí passa per sobre, el subratllat s'estén. */
 .nav-link:hover::after {
-  width: 100%; /* El subratllat s'estén al 100% a l'hover */
+  width: 100%;
 }
 
-/* Ajustos per a pantalles petites */
+/* Ajustos de disseny per a pantalles petites. */
 @media (max-width: 640px) {
+  /* Reducció de l'espaiat i ajust per a elements en línies múltiples. */
   .my-navbar {
-    gap: 1.5rem; /* Redueix l'espai en pantalles petites */
-    flex-wrap: wrap; /* Permet que els enllaços es distribueixin en diverses línies si és necessari */
+    gap: 1.5rem;
+    flex-wrap: wrap;
     justify-content: center;
   }
 
+  /* Ajust de la mida de la font dels enllaços. */
   .nav-link {
-    font-size: 0.95rem; /* Mida de font lleugerament més petita */
+    font-size: 0.95rem;
     padding: 0.4rem 0.8rem;
   }
 }

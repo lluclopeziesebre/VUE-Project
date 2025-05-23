@@ -52,7 +52,6 @@
         <p class="text-sm">{{ errorBreeds }}</p>
       </div>
 
-
       <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-xl bg-gray-100 shadow-inner flex items-center justify-center border border-gray-200">
         <div v-if="loadingImage" class="flex flex-col items-center justify-center w-full h-full text-blue-500">
           <svg class="animate-spin h-16 w-16 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -88,53 +87,65 @@
 </template>
 
 <script setup>
+// Importa les funcions necessàries de Vue per a la reactivitat i el cicle de vida.
 import { ref, onMounted } from 'vue';
 
+// Variables reactives per emmagatzemar l'URL de la imatge, la llista de races, la raça seleccionada i l'actual.
 const imageUrl = ref('');
 const breeds = ref([]);
 const selectedBreed = ref('');
 const currentDogBreed = ref('');
 
+// Variables reactives per gestionar l'estat de càrrega i errors.
 const loadingImage = ref(false);
 const loadingBreeds = ref(false);
 const errorImage = ref(null);
 const errorBreeds = ref(null);
-const currentAction = ref('');
+const currentAction = ref(''); // Per saber quina acció de càrrega s'està executant.
 
-// API Endpoints
+// Definicions dels punts finals de l'API (URLs).
 const RANDOM_IMAGE_URL = 'https://dog.ceo/api/breeds/image/random';
 const ALL_BREEDS_URL = 'https://dog.ceo/api/breeds/list/all';
 const BREED_IMAGE_URL_PREFIX = 'https://dog.ceo/api/breed/';
 
-// --- Funciones para obtener datos ---
+// --- Funcions per obtenir dades ---
 
+// Funció genèrica per fer peticions a l'API.
 async function fetchApi(url, loadingSignal, errorSignal, actionName = '') {
+  // Activa l'indicador de càrrega i reseteja l'error.
   if (loadingSignal) loadingSignal.value = true;
   if (errorSignal) errorSignal.value = null;
   if (actionName) currentAction.value = actionName;
 
   try {
+    // Realitza la petició HTTP.
     const response = await fetch(url);
+    // Comprova si la resposta de l'API és exitosa.
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: response.statusText }));
       throw new Error(`Error ${response.status}: ${errorData.message || response.statusText}`);
     }
+    // Parseja la resposta JSON.
     const data = await response.json();
+    // Comprova l'estat retornat per l'API (específic de Dog CEO API).
     if (data.status !== 'success') {
-      throw new Error(data.message || 'La API no devolvió un estado exitoso.');
+      throw new Error(data.message || 'La API no va retornar un estat exitós.');
     }
+    // Retorna el missatge de la resposta (normalment l'URL de la imatge o les races).
     return data.message;
   } catch (e) {
-    console.error(`Error fetching ${url}:`, e);
+    // Captura i registra qualsevol error.
+    console.error(`Error en obtenir dades de ${url}:`, e);
     if (errorSignal) errorSignal.value = e.message;
     return null;
   } finally {
+    // Desactiva l'indicador de càrrega al final.
     if (loadingSignal) loadingSignal.value = false;
     if (actionName) currentAction.value = '';
   }
 }
 
-// Funció auxiliar per extreure la raça de la URL de la imatge
+// Funció auxiliar per extreure el nom de la raça d'una URL d'imatge.
 function extractBreedFromImageUrl(url) {
   if (!url) return '';
   const parts = url.split('/');
@@ -150,6 +161,7 @@ function extractBreedFromImageUrl(url) {
   return '';
 }
 
+// Funció per obtenir una imatge de gosset aleatòria.
 async function fetchRandomDogImage() {
   const newImageUrl = await fetchApi(RANDOM_IMAGE_URL, loadingImage, errorImage, 'random');
   if (newImageUrl) {
@@ -160,10 +172,12 @@ async function fetchRandomDogImage() {
   }
 }
 
+// Funció per obtenir la llista completa de races de gos.
 async function fetchAllBreeds() {
   const breedsData = await fetchApi(ALL_BREEDS_URL, loadingBreeds, errorBreeds);
   if (breedsData) {
     const breedsList = [];
+    // Processa les dades de races per incloure sub-races.
     for (const breed in breedsData) {
       if (breedsData[breed].length === 0) {
         breedsList.push(breed);
@@ -173,12 +187,14 @@ async function fetchAllBreeds() {
         });
       }
     }
+    // Ordena les races alfabèticament.
     breeds.value = breedsList.sort();
   }
 }
 
+// Funció per obtenir una imatge d'una raça específica.
 async function fetchDogImageByBreed() {
-  if (!selectedBreed.value) return;
+  if (!selectedBreed.value) return; // No fer res si no hi ha raça seleccionada.
   const url = `${BREED_IMAGE_URL_PREFIX}${selectedBreed.value}/images/random`;
   const newImageUrl = await fetchApi(url, loadingImage, errorImage, 'breed');
   if (newImageUrl) {
@@ -189,44 +205,47 @@ async function fetchDogImageByBreed() {
   }
 }
 
-// Function to handle image load for transition effect
+// Funció per gestionar la càrrega de la imatge per a un efecte de transició.
 function onImageLoad(event) {
   event.target.classList.remove('opacity-0');
   event.target.classList.add('opacity-100');
 }
 
-// --- Utilidades ---
+// --- Utilitats ---
+// Funció per posar la primera lletra en majúscula.
 function capitalizeFirstLetter(string) {
   if (!string) return '';
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-// --- Hook del ciclo de vida ---
+// --- Hook del cicle de vida ---
+// S'executa quan el component s'ha muntat.
 onMounted(async () => {
+  // Carrega les races i una imatge aleatòria en iniciar.
   await fetchAllBreeds();
   await fetchRandomDogImage();
 });
 </script>
 
 <style scoped>
-/* Importa la font de Google Fonts */
+/* Importa la font de Google Fonts. */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
-
-/* Custom Select Arrow Styling */
+/* Estils personalitzats per a la fletxa del selector (dropdown). */
 .custom-select {
-  -webkit-appearance: none; /* Desactiva la flecha nativa en navegadores WebKit (Chrome, Safari) */
-  -moz-appearance: none;    /* Desactiva la flecha nativa en navegadores Gecko (Firefox) */
-  appearance: none;         /* Desactiva la flecha nativa estándar */
+  /* Desactiva la fletxa nativa del navegador. */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  /* Imatge de fons personalitzada per a la fletxa. */
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.75rem center;
   background-repeat: no-repeat;
   background-size: 1.25em 1.25em;
-  padding-right: 2.75rem; /* Asegura espacio para la flecha personalizada */
+  padding-right: 2.75rem;
 }
 
-/* Enhancements for image container aspect ratio - Tailwind JIT often handles this */
-/* Keeping these for broader compatibility if JIT is not fully configured */
+/* Millores per a la relació d'aspecte del contenidor d'imatges. */
 .aspect-w-1 { --tw-aspect-w: 1; }
 .aspect-h-1 { --tw-aspect-h: 1; }
 @supports (aspect-ratio: 1 / 1) {
@@ -235,15 +254,16 @@ onMounted(async () => {
   .aspect-w-1.aspect-h-1 { aspect-ratio: 1 / 1; }
 }
 
+/* Estils per al subtítol. */
 .subtitle {
   text-align: center;
-  font-size: 1.25rem; /* Més gran i llegible */
-  color: var(--dark-text-color); /* Color més fosc per a major contrast */
-  margin-bottom: 3rem; /* Més espai abans del contenidor */
+  font-size: 1.25rem;
+  color: var(--dark-text-color);
+  margin-bottom: 3rem;
   max-width: 600px;
 }
 
-/* Deeper shadows for a more premium feel */
+/* Ombres més profundes per a un aspecte més prèmium. */
 .shadow-2xl {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
@@ -254,7 +274,7 @@ onMounted(async () => {
   box-shadow: 0 45px 80px -20px rgba(0, 0, 0, 0.2), 0 25px 40px -15px rgba(0, 0, 0, 0.1);
 }
 
-/* Animations */
+/* Animacions CSS. */
 @keyframes fadeInDown {
   from { opacity: 0; transform: translateY(-20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -271,17 +291,19 @@ onMounted(async () => {
   20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
+/* Aplicació de l'animació fade-in-up. */
 .fade-in-up {
   animation: fadeInUp 0.8s ease-out forwards;
 }
 
+/* Aplicació de l'animació shake. */
 .animated-shake {
   animation: shake 0.5s ease-in-out;
 }
 
-/* General body/container background */
+/* Estils generals per al cos/contenidor de la pàgina. */
 .container {
-  background-color: #ffffff; /* Fondo blanco puro */
+  background-color: #ffffff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -289,11 +311,11 @@ onMounted(async () => {
   align-items: center;
   padding-top: 2rem;
   padding-bottom: 2rem;
-  /* Aplica la fuente Nunito */
+  /* Aplica la font Nunito. */
   font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Adjust header spacing for better visual flow */
+/* Ajusta l'espaiat de la capçalera per a un millor flux visual. */
 header {
   margin-bottom: 3rem;
 }
